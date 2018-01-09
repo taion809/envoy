@@ -60,7 +60,7 @@ def envoy_linkopts():
             "-static-libstdc++",
             "-static-libgcc",
         ],
-    }) + envoy_select_exported_symbols(['-Wl,-E'])
+    }) + select({"//bazel:enable_exported_symbols": ['-Wl,-E']})
 
 # Compute the test linkopts based on various options.
 def envoy_test_linkopts():
