@@ -43,27 +43,7 @@ def envoy_linkopts():
             # See note here: http://luajit.org/install.html
             "-pagezero_size 10000", "-image_base 100000000",
         ],
-        "//bazel:enable_exported_symbols": [
-            '-L/usr/local/lib/lua/5.1/',
-            "-pthread",
-            "-lrt",
-            "-ldl",
-            # Force MD5 hash in build. This is part of the workaround for
-            # https://github.com/bazelbuild/bazel/issues/2805. Bazel actually
-            # does this by itself prior to
-            # https://github.com/bazelbuild/bazel/commit/724706ba4836c3366fc85b40ed50ccf92f4c3882.
-            # Ironically, forcing it here so that in future releases we will
-            # have the same behavior. When everyone is using an updated version
-            # of Bazel, we can use linkopts to set the git SHA1 directly in the
-            # --build-id and avoid doing the following.
-            '-Wl,--build-id=md5',
-            '-Wl,--hash-style=gnu',
-            '-Wl,-E',
-            "-static-libstdc++",
-            "-static-libgcc",
-        ],
         "//conditions:default": [
-            '-L/usr/local/lib/lua/5.1/',
             "-pthread",
             "-lrt",
             "-ldl",
@@ -80,7 +60,7 @@ def envoy_linkopts():
             "-static-libstdc++",
             "-static-libgcc",
         ],
-    })
+    }) + envoy_select_exported_symbols(['-Wl,-E'])
 
 # Compute the test linkopts based on various options.
 def envoy_test_linkopts():
@@ -388,4 +368,11 @@ def envoy_select_google_grpc(xs, repository = ""):
     return select({
         repository + "//bazel:disable_google_grpc": [],
         "//conditions:default": xs,
+    })
+
+# Selects the given values if Google gRPC is enabled in the current build.
+def envoy_select_exported_symbols(xs):
+    return select({
+        "//bazel:enable_exported_symbols": xs,
+        "//conditions:default": [],
     })

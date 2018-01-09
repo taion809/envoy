@@ -255,7 +255,8 @@ The following optional features can be disabled on the Bazel build command-line:
 
 The following optional features can be enabled on the Bazel build command-line:
 
-* Exported symbols during linking with `--define exported_symbols=enabled`
+* Exported symbols during linking with `--define exported_symbols=enabled`.
+  This is useful in cases where you have a lua script that loads shared object libraries, such as those installed via luarocks.
 
 ## Stats Tunables
 
