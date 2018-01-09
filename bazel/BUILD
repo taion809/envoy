@@ -41,3 +41,8 @@ config_setting(
     name = "disable_google_grpc",
     values = {"define": "google_grpc=disabled"},
 )
+
+config_setting(
+    name = "enable_exported_symbols",
+    values = {"define": "exported_symbols=enabled"},
+)
