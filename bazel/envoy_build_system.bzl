@@ -32,7 +32,7 @@ def envoy_copts(repository, test = False):
         envoy_select_google_grpc(["-DENVOY_GOOGLE_GRPC"], repository)
 
 # Compute the final linkopts based on various options.
-def envoy_linkopts():
+def envoy_linkopts(repository):
     return select({
         # OSX provides system and stdc++ libraries dynamically, so they can't be linked statically.
         # Further, the system library transitively links common libraries (e.g., pthread).
@@ -60,7 +60,7 @@ def envoy_linkopts():
             "-static-libstdc++",
             "-static-libgcc",
         ],
-    }) + select({"//bazel:enable_exported_symbols": ['-Wl,-E']})
+    }) + envoy_select_exported_symbols(["-Wl,-E"], repository)
 
 # Compute the test linkopts based on various options.
 def envoy_test_linkopts():
@@ -168,11 +168,16 @@ def envoy_cc_binary(name,
                     repository = "",
                     stamped = False,
                     deps = [],
-                    linkopts = envoy_linkopts()):
+                    linkopts = []):
+
+    if linkopts == []:
+        linkopts = envoy_linkopts(repository)
+
     # Implicit .stamped targets to obtain builds with the (truncated) git SHA1.
     if stamped:
         _git_stamped_genrule(repository, name)
         _git_stamped_genrule(repository, name + ".stripped")
+
     native.cc_binary(
         name = name,
         srcs = srcs,
@@ -370,9 +375,9 @@ def envoy_select_google_grpc(xs, repository = ""):
         "//conditions:default": xs,
     })
 
-# Selects the given values if Google gRPC is enabled in the current build.
-def envoy_select_exported_symbols(xs):
+# Select stuff
+def envoy_select_exported_symbols(xs, repository=""):
     return select({
-        "//bazel:enable_exported_symbols": xs,
+        repository + "//bazel:enable_exported_symbols": xs,
         "//conditions:default": [],
     })
