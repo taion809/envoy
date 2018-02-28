@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <absl/types/optional>
 
 #include "envoy/common/optional.h"
 #include "envoy/common/pure.h"
@@ -194,7 +195,7 @@ public:
   virtual AsyncRequest* send(const Protobuf::MethodDescriptor& service_method,
                              const Protobuf::Message& request, AsyncRequestCallbacks& callbacks,
                              Tracing::Span& parent_span,
-                             const Optional<std::chrono::milliseconds>& timeout) PURE;
+                             const absl::optional<std::chrono::milliseconds>& timeout) PURE;
 
   /**
    * Start a gRPC stream asynchronously.
