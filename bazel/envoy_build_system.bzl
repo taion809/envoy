@@ -17,7 +17,7 @@ def envoy_copts(repository, test = False):
         # Bazel adds an implicit -DNDEBUG for opt.
         repository + "//bazel:opt_build": [] if test else ["-ggdb3"],
         repository + "//bazel:fastbuild_build": [],
-        repository + "//bazel:dbg_build": ["-ggdb3"],
+        repository + "//bazel:dbg_build": ["-ggdb3", "-fno-limit-debug-info"],
     }) + select({
         repository + "//bazel:disable_tcmalloc": [],
         "//conditions:default": ["-DTCMALLOC"],
