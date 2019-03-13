@@ -1405,6 +1405,19 @@ envoy_histogram1_count{} 0
   EXPECT_EQ(expected_output, response.toString());
 }
 
+TEST_F(PrometheusStatsFormatterTest, OutputLivenessCheckBoolIndicatorType) {
+  addBoolIndicator("server.live", {});
+  Buffer::OwnedImpl response;
+
+  auto size = PrometheusStatsFormatter::statsAsPrometheus(counters_, gauges_, histograms_, boolIndicators_, response, false);
+  EXPECT_EQ(1UL, size);
+  
+  const std::string expected_output = R"EOF(# TYPE envoy_server_live gauge
+envoy_server_live{} 0)EOF";
+
+  EXPECT_EQ(expected_output, response.toString());
+}
+
 TEST_F(PrometheusStatsFormatterTest, OutputWithAllMetricTypes) {
   addCounter("cluster.test_1.upstream_cx_total", {{"a.tag-name", "a.tag-value"}});
   addCounter("cluster.test_2.upstream_cx_total", {{"another_tag_name", "another_tag-value"}});
